@@ -12,6 +12,17 @@ class MovieSliderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    if (this.movies.length == 0) {
+      
+      return Container(
+        width: double.infinity,
+        height: 260.0,
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Container(
       width: double.infinity,
       height: 260.0,
