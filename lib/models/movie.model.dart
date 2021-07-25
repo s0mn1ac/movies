@@ -34,8 +34,12 @@ class MovieModel {
   double voteAverage;
   int voteCount;
 
-  get fullPosterImageUrl {
+  get fullPosterParh {
     return this.posterPath != null ? 'https://image.tmdb.org/t/p/w500${this.posterPath}' : 'https://i.stack.imgur.com/GNhxO.png';
+  }
+
+  get fullBackdropPath {
+    return this.posterPath != null ? 'https://image.tmdb.org/t/p/w500${this.backdropPath}' : 'https://i.stack.imgur.com/GNhxO.png';
   }
 
   factory MovieModel.fromJson(String str) => MovieModel.fromMap(json.decode(str));
