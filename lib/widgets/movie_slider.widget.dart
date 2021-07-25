@@ -2,18 +2,42 @@ import 'package:flutter/material.dart';
 
 import 'package:movies/models/models.dart';
 
-class MovieSliderWidget extends StatelessWidget {
+class MovieSliderWidget extends StatefulWidget {
 
   final List<MovieModel> movies;
   final String? title;
+  final Function onNextPage;
 
-  const MovieSliderWidget({ Key? key, required this.movies, this.title }) : super(key: key);
+  const MovieSliderWidget({ Key? key, required this.movies, required this.onNextPage, this.title }) : super(key: key);
+
+  @override
+  _MovieSliderWidgetState createState() => _MovieSliderWidgetState();
+}
+
+class _MovieSliderWidgetState extends State<MovieSliderWidget> {
+
+  final ScrollController scrollController = new ScrollController();
+
+  @override
+  void initState() { 
+    super.initState();
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >= scrollController.position.maxScrollExtent - 500) {
+        widget.onNextPage();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
 
-    if (this.movies.length == 0) {
-      
+    if (this.widget.movies.length == 0) {
       return Container(
         width: double.infinity,
         height: 260.0,
@@ -30,26 +54,26 @@ class MovieSliderWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
 
-          if (this.title != null)
+          if (this.widget.title != null)
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.0),
-              child: Text(title!, style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold)),
+              child: Text(this.widget.title!, style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold)),
             ),
 
           SizedBox(height: 5.0),
           
           Expanded(
             child: ListView.builder(
+              controller: scrollController,
               scrollDirection: Axis.horizontal,
               itemCount: 20,
-              itemBuilder: (_, int index) => _MoviePoster(movies[index])
+              itemBuilder: (_, int index) => _MoviePoster(widget.movies[index])
             ),
           )
         ],
       ),
     );
   }
-
 }
 
 class _MoviePoster extends StatelessWidget {
