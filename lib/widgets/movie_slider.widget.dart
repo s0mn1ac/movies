@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 
+import 'package:movies/models/models.dart';
+
 class MovieSliderWidget extends StatelessWidget {
+
+  final List<MovieModel> movies;
+  final String? title;
+
+  const MovieSliderWidget({ Key? key, required this.movies, this.title }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -12,16 +19,19 @@ class MovieSliderWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
 
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.0),
-            child: Text('Populares', style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold)),
-          ),
+          if (this.title != null)
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.0),
+              child: Text(title!, style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold)),
+            ),
+
           SizedBox(height: 5.0),
+          
           Expanded(
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: 20,
-              itemBuilder: (_, int index) => _MoviePoster()
+              itemBuilder: (_, int index) => _MoviePoster(movies[index])
             ),
           )
         ],
@@ -32,6 +42,10 @@ class MovieSliderWidget extends StatelessWidget {
 }
 
 class _MoviePoster extends StatelessWidget {
+
+  final MovieModel movie;
+
+  const _MoviePoster(this.movie);
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +63,7 @@ class _MoviePoster extends StatelessWidget {
               borderRadius: BorderRadius.circular(20.0),
               child: FadeInImage(
                 placeholder: AssetImage('assets/no-image.jpg'),
-                image: NetworkImage('https://via.placeholder.com/300x400'),
+                image: NetworkImage(movie.fullPosterImageUrl),
                 width: 130.0,
                 height: 190.0,
                 fit: BoxFit.cover
@@ -58,7 +72,7 @@ class _MoviePoster extends StatelessWidget {
           ),
           SizedBox(height: 5.0),
           Text(
-            'nelvervkloermvmrelmvlkremlvmrmvmdklmvldfmlvmdflmbv,df,bnm,dfnmbndm,nb,mdnbm,dnfm,nf,bmdnfnb,dnfm,bnd',
+            movie.title,
             overflow: TextOverflow.ellipsis,
             maxLines: 2,
             textAlign: TextAlign.center
