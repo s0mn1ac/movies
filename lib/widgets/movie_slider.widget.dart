@@ -66,7 +66,7 @@ class _MovieSliderWidgetState extends State<MovieSliderWidget> {
             child: ListView.builder(
               controller: scrollController,
               scrollDirection: Axis.horizontal,
-              itemCount: 20,
+              itemCount: this.widget.movies.length,
               itemBuilder: (_, int index) => _MoviePoster(widget.movies[index])
             ),
           )
