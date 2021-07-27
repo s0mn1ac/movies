@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:movies/helpers/debouncer.dart';
 
 import 'package:movies/models/models.dart';
 import 'package:movies/models/search_movies_response.model.dart';
@@ -17,6 +20,13 @@ class MoviesProvider extends ChangeNotifier {
   Map<int, List<CastModel>> moviesCast = {};
 
   int _popularPage = 0;
+
+  final debouncer = Debouncer(
+    duration: Duration(milliseconds: 500)
+  );
+
+  final StreamController<List<MovieModel>> _suggestionStreamController = new StreamController.broadcast();
+  Stream<List<MovieModel>> get suggestionsStream => this._suggestionStreamController.stream;
 
   MoviesProvider() {
     this.getOnDisplayMovies();
@@ -59,18 +69,6 @@ class MoviesProvider extends ChangeNotifier {
     return castResponse.cast;
   }
 
-  Future<String>_getJsonResponse(String endpoint, [int page = 1]) async {
-
-    final url = Uri.https(_baseUrl, '$endpoint', {
-      'api_key': _apiKey,
-      'language': _language,
-      'page': '$page'
-    });
-
-    final response = await http.get(url);
-    return response.body;
-  }
-
   Future<List<MovieModel>> getSearchMovies(String query) async {
 
     final url = Uri.https(_baseUrl, '3/search/movie', {
@@ -82,6 +80,33 @@ class MoviesProvider extends ChangeNotifier {
     final response = await http.get(url);
     final searchResponse = SearchMoviesResponseModel.fromJson(response.body);
     return searchResponse.results;
+  }
+
+  void getSuggestionsByQuery(String query) {
+
+    debouncer.value = '';
+    debouncer.onValue = (value) async {
+      final results = await this.getSearchMovies(query);
+      this._suggestionStreamController.add(results);
+    };
+
+    final timer = Timer.periodic(Duration(milliseconds: 300), (_) {
+      debouncer.value = query;
+    });
+
+    Future.delayed(Duration(milliseconds: 301)).then((_) => timer.cancel());
+  }
+
+  Future<String>_getJsonResponse(String endpoint, [int page = 1]) async {
+
+    final url = Uri.https(_baseUrl, '$endpoint', {
+      'api_key': _apiKey,
+      'language': _language,
+      'page': '$page'
+    });
+
+    final response = await http.get(url);
+    return response.body;
   }
 
 }
